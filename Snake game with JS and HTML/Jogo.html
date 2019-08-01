@@ -1,0 +1,102 @@
+<audio id="som1">
+  <source src="lightsaber.mp3" type="audio/mpeg">
+</audio>
+
+
+
+<a href="Fase1.html" onMouseOver="return changeImage()" onMouseOut= "return changeImageBack()"
+onMouseDown="return handleMDown()" onMouseUp="return handleMUp()">
+<img name="fase1" src="Fase1.png" width="420" height="600" border="0" alt="javascript button"></a>
+ 
+<script type="text/javascript">
+var o = document.getElementById("som1"); 
+
+function changeImage()
+{
+document.images["fase1"].src= "fase1c.png";
+return true;
+}
+function changeImageBack()
+{
+ document.images["fase1"].src = "Fase1.png";
+ return true;
+}
+function handleMDown()
+{
+ document.images["fase1"].src = "fase1c.png";
+ return true;
+}
+function handleMUp()
+{
+ changeImage();
+ return true;
+}
+
+</script>
+
+<a href="fase2.html" onMouseOver="return changeImage2()" onMouseOut= "return changeImageBack2()"
+onMouseDown="return handleMDown2()" onMouseUp="return handleMUp2()">
+<img name="fase2" src="Fase2.jpg" width="420" height="600" border="0" alt="javascript button"></a>
+ 
+<script type="text/javascript">
+var o = document.getElementById("som1"); 
+
+function changeImage2()
+{
+document.images["fase2"].src= "fase-2.gif";
+playAudio1();
+return true;
+}
+function changeImageBack2()
+{
+ document.images["fase2"].src = "Fase2.jpg";
+ return true;
+}
+function handleMDown2()
+{
+ document.images["fase2"].src = "fase2click.jpg";
+ return true;
+}
+function handleMUp2()
+{
+ changeImage2();
+ return true;
+}
+
+
+function playAudio1() { 
+  o.play(); 
+} 
+
+</script>
+
+<a href="Fase 3.html" onMouseOver="return changeImage3()" onMouseOut= "return changeImageBack3()"
+onMouseDown="return handleMDown3()" onMouseUp="return handleMUp3()">
+<img name="fase3" src="Fase3.png" width="420" height="600" border="0" alt="javascript button"></a>
+ 
+<script type="text/javascript">
+
+function changeImage3()
+{
+document.images["fase3"].src= "fase3c.png";
+return true;
+}
+function changeImageBack3()
+{
+ document.images["fase3"].src = "fase3.png";
+ return true;
+}
+function handleMDown3()
+{
+ document.images["fase3"].src = "fase3b.png";
+ return true;
+}
+function handleMUp()
+{
+ changeImage3();
+ return true;
+}
+
+} 
+
+</script>

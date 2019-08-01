@@ -1,0 +1,819 @@
+<meta charset="utf-8">
+
+<audio id="som1">
+  <source src="yoda.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="som3">
+  <source src="bonfire.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="som4">
+  <source src="nope.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="tela" width="600" height="600" ></canvas>
+<canvas id="menu" width="400" height="600"></canvas>
+<canvas id="ranking" width="320" height="600"></canvas>
+
+<script>
+
+
+var j = prompt("Qual seu nome?");
+if(j == ""){
+	j = "Visitante";
+}
+
+var score = 0;
+
+var dados = JSON.parse(localStorage.getItem("dados")) || [];
+var ranking = JSON.parse(localStorage.getItem("dados"));
+for(var i = 0; i < dados.length-1;i++){
+	for(var z = 0; z < dados.length-1 - i;z++) {
+		if(ranking[z].ScoreR < ranking[z+1].ScoreR)
+		{			
+			[[ranking[z].ScoreR,ranking[z+1].ScoreR] = [ranking[z+1].ScoreR,ranking[z].ScoreR]];
+			[[ranking[z].jogador,ranking[z+1].jogador] = [ranking[z+1].jogador,ranking[z].jogador]];
+		}
+	}
+}
+
+
+dados[dados.length] = {
+	jogador: j,
+	ScoreR: score
+	}
+localStorage.setItem("dados",JSON.stringify(dados)); 
+
+
+var o = document.getElementById("som1"); 
+var h = document.getElementById("som3"); 
+var u = document.getElementById("som4"); 
+var tela;
+var tela2;
+var c;
+var s;
+var vida = 5
+var tempo = 400
+
+var cabeca;
+var maca;
+var bola;
+var cobrazul;
+var cobrama;
+var cobranco;
+var cobraver;
+var cobrared;
+var obs;
+var pontos;
+var White;
+var WhiteX = [];
+var WhiteY = [];
+var BlueX = [];
+var BlueY = [];
+var Blue;
+var Yellow;
+var YellowX = [];
+var YellowY = [];
+var GreenX = [];
+var GreenY = [];
+var Green
+var macaX = [];
+var macaY = [];
+var obsX = [];
+var obsY = [];
+var parede;
+var paredeX1;
+var paredeY1 = [];
+var paredeX2;
+var paredeY2 = [];
+
+
+var paraEsquerda = false;
+var paraDireita = true;
+var paraCima = false;
+var paraBaixo = false;
+var noJogo = true;    
+
+const TAMANHO_PONTO = 10;
+const ALEATORIO_MAXIMOX = 58;
+const ALEATORIO_MAXIMOY = 58;
+const ATRASO = 70;
+const C_ALTURA = 600;
+const C_LARGURA = 600;    
+
+const TECLA_ESQUERDA = 37;
+const TECLA_DIREITA = 39;
+const TECLA_ACIMA = 38;
+const TECLA_ABAIXO = 40;
+
+var x = [];
+var y = [];
+
+setInterval(canvasStatus,100);
+iniciar();
+rankingcanvas();
+
+// Funções
+
+  
+function iniciar() {
+    tela = document.getElementById("tela");
+    c = tela.getContext("2d");
+
+	c.beginPath();
+	c.rect(0, 0, C_LARGURA, C_ALTURA);
+	c.fillStyle = "gray";
+	c.fill();
+	
+    carregarArquivos();
+	criarparede();
+	playAudio3();
+    localizarMacaBr();
+	localizarMacaAm();
+	localizarMacaAz();
+	localizarMacaVer();
+	criarCobra();
+    localizarMaca();
+	localizarobs();
+    setTimeout("cicloDeJogo()", ATRASO);
+}    
+
+
+function carregarArquivos() {
+    cabeca = new Image();
+    cabeca.src = "cabeca.png";    
+    
+    bola = new Image();
+    bola.src = "ponto.png"; 
+    
+	maca = new Image();
+    maca.src = "maca.png";
+	
+	obs = new Image();    
+	obs.src = "obs.png";
+	
+	parede = new Image();    
+	parede.src = "parede.png";
+	
+	White = new Image();
+    White.src = "branco.png";
+	
+	Blue = new Image();
+    Blue.src = "azul.png";
+	
+	Yellow = new Image();
+    Yellow.src = "amarelo.png";
+	
+	Green = new Image();
+    Green.src = "verde.png";
+	
+	
+	cobrazul = new Image();
+    cobrazul.src = "cobrazul.png"
+	
+	cobrama = new Image();
+    cobrama.src = "cobramarela.png"
+	
+	cobranco = new Image();
+    cobranco.src = "cobranca.png"
+	
+	cobraver = new Image();
+    cobraver.src = "cobraverde.png"
+	
+	cobrared = new Image();
+	cobrared.src = "cobravermelha.png"
+	
+}
+
+
+function criarparede(){
+	paredeX1 = 150;
+	for(var i = 100;i<=500;i+=10)
+	{
+		paredeY1.push(i);
+	}
+	
+	paredeX2 = 450;
+	for(var i = 100;i<=500;i+=10)
+	{
+		paredeY2.push(i);
+	}
+}
+
+function criarCobra() {
+    pontos = 6;
+	
+    for (var z = 0; z < pontos; z++) {
+        x[z] = 50 - z * 10;
+        y[z] = 50;
+    }
+}
+
+function localizarMaca(){
+	
+	for(i = 1; i <=3;i++){
+		var r = Math.trunc(Math.random() * ALEATORIO_MAXIMOX);
+		var rX = r * TAMANHO_PONTO;
+			
+		macaX.push(rX);
+			
+
+		var p = Math.trunc(Math.random() * ALEATORIO_MAXIMOY);
+		var pY = p * TAMANHO_PONTO;
+
+		macaY.push(pY);
+
+		c.drawImage(maca, macaX[i], macaY[i]); 
+
+	}
+	
+}    
+function localizarMacaAm(){
+	
+	for(i = 1; i <=3;i++){
+		var r = Math.trunc(Math.random() * ALEATORIO_MAXIMOX);
+		var rX = r * TAMANHO_PONTO;
+			
+		YellowX.push(rX);
+			
+
+		var p = Math.trunc(Math.random() * ALEATORIO_MAXIMOY);
+		var pY = p * TAMANHO_PONTO;
+
+		YellowY.push(pY);
+
+		c.drawImage(Yellow, YellowX[i], YellowY[i]); 
+
+	}
+	
+}    
+function localizarMacaVer(){
+	
+	for(i = 1; i <=3;i++){
+		var r = Math.trunc(Math.random() * ALEATORIO_MAXIMOX);
+		var rX = r * TAMANHO_PONTO;
+			
+		GreenX.push(rX);
+			
+
+		var p = Math.trunc(Math.random() * ALEATORIO_MAXIMOY);
+		var pY = p * TAMANHO_PONTO;
+
+		GreenY.push(pY);
+
+		c.drawImage(Green, GreenX[i], GreenY[i]); 
+
+	}
+	
+}    
+function localizarMacaAz(){
+	
+	for(i = 1; i <=3;i++){
+		var r = Math.trunc(Math.random() * ALEATORIO_MAXIMOX);
+		var rX = r * TAMANHO_PONTO;
+			
+		BlueX.push(rX);
+			
+
+		var p = Math.trunc(Math.random() * ALEATORIO_MAXIMOY);
+		var pY = p * TAMANHO_PONTO;
+
+		BlueY.push(pY);
+
+		c.drawImage(Blue, BlueX[i], BlueY[i]); 
+
+	}
+	
+}    
+function localizarMacaBr(){
+	
+	for(i = 1; i <=3;i++){
+		var r = Math.trunc(Math.random() * ALEATORIO_MAXIMOX);
+		var rX = r * TAMANHO_PONTO;
+			
+		WhiteX.push(rX);
+			
+
+		var p = Math.trunc(Math.random() * ALEATORIO_MAXIMOY);
+		var pY = p * TAMANHO_PONTO;
+
+		WhiteY.push(pY);
+
+		c.drawImage(White, WhiteX[i], WhiteY[i]); 
+
+	}
+	
+}    
+
+    
+
+function localizarobs() {
+	for(i = 1; i <=10;i++) {	
+		var a = Math.trunc(Math.random() * ALEATORIO_MAXIMOX);
+		var aX = a * TAMANHO_PONTO;
+			
+		obsX.push(aX);
+			
+		var b = Math.trunc(Math.random() * ALEATORIO_MAXIMOY);
+		var bY = b * TAMANHO_PONTO;
+			
+		obsY.push(bY);
+		c.drawImage(obs, obsX[i], obsY[i]); 
+			
+	}
+}
+
+function cicloDeJogo() {
+    if (noJogo) {
+        verificarMaca();
+		verificarMacaAm();
+		verificarMacaAz();
+		verificarMacaBr();
+		verificarMacaVer();
+		verificarobs();
+        verificarColisao();
+		verificarParede();
+		verificarbugparede();
+        mover();
+        fazerDesenho();
+        setTimeout("cicloDeJogo()", ATRASO);
+    }
+}
+
+function verificarMaca() {
+    for(i = 1; i <=3 ; i++){
+		if ((x[0] == macaX[i]) && (y[0] == macaY[i])) {	
+			playAudio1()		
+			score+=5;
+			bola = cobrared;
+			macaX[i] = 165121;
+			macaY[i] = 156166;
+			if(score%3 == 0){
+			vida++;
+			}
+		}
+	}
+
+}
+function verificarMacaAz() {
+    for(i = 1; i <=3 ; i++){
+		if ((x[0] == BlueX[i]) && (y[0] == BlueY[i])) {	
+			playAudio1()		
+			score+=2;
+			bola = cobrazul;
+			BlueX[i] = 165121;
+			BlueY[i] = 156166;
+			if(score%3 == 0){
+			vida++;
+			}
+		}
+	}
+
+}
+function verificarMacaVer() {
+    for(i = 1; i <=3 ; i++){
+		if ((x[0] == GreenX[i]) && (y[0] == GreenY[i])) {	
+			playAudio1()		
+			score+=3;
+			bola = cobraver;
+			GreenX[i] = 165121;
+			GreenY[i] = 156166;
+			if(score%3 == 0){
+			vida++;
+			}
+		}
+	}
+
+}
+function verificarMacaAm() {
+    for(i = 1; i <=3 ; i++){
+		if ((x[0] == YellowX[i]) && (y[0] == YellowY[i])) {	
+			playAudio1()		
+			score+=4;
+			bola = cobrama;
+			YellowX[i] = 165121;
+			YellowY[i] = 156166;
+			if(score%3 == 0){
+			vida++;
+			}
+		}
+	}
+
+}
+function verificarMacaBr() {
+    for(i = 1; i <=3 ; i++){
+		if ((x[0] == WhiteX[i]) && (y[0] == WhiteY[i])) {	
+			playAudio1()		
+			score++;
+			bola = cobranco;
+			WhiteX[i] = 165121;
+			WhiteY[i] = 156166;
+			if(score%3 == 0){
+			vida++;
+			}
+		}
+	}
+
+}
+
+function verificarobs() {
+	 for(i = 1; i <=10 ; i++){
+		if ((x[0] == obsX[i]) && (y[0] == obsY[i])) {		       
+			vida--;
+			playAudio4()
+			obsX[i] = 165121;
+			obsY[i] = 156166;
+
+		}
+
+    }
+} 
+
+
+function verificarParede()
+{
+	for(var i = 0;i<42;i++)
+	{
+		if(x[0] == paredeX1 && y[0] == paredeY1[i] && score != 45)
+		{
+			setTimeout(fimDeJogo,0);
+			pontos = 0;
+		}
+		if(x[0] == paredeX2 && y[0] == paredeY2[i] && score != 45)
+		{
+			setTimeout(fimDeJogo,0);
+			pontos = 0;
+		}
+	}
+}
+
+function verificarbugparede() //vai verificar alguns bugs na parede
+{
+	for(var z = 0;z<obsY.length;z++)	//OBSTACULO/parede NA parede 1
+	{
+		for(var i = 0;i < paredeY1.length;i++) 
+		{
+			if(obsX[z] == paredeX1 && obsY[z] == paredeY1[i])
+			{
+				obsX[z] = Math.trunc(Math.random() * ALEATORIO_MAXIMOX)*TAMANHO_PONTO;
+				obsY[z] = Math.trunc(Math.random() * ALEATORIO_MAXIMOY)*TAMANHO_PONTO;
+				verificarbugparede();
+			}
+		}	
+	}
+	for(var z = 0;z<obsY.length;z++) //OBSTACULO/parede NA parede 2
+	{
+		for(var i = 0;i < paredeY2.length;i++)  
+		{
+			if(obsX[z] == paredeX2 && obsY[z] == paredeY2[i])
+			{
+				obsX[z] = Math.trunc(Math.random() * ALEATORIO_MAXIMOX)*TAMANHO_PONTO;
+				obsY[z] = Math.trunc(Math.random() * ALEATORIO_MAXIMOY)*TAMANHO_PONTO;
+				verificarbugparede();
+			}
+		}	
+	}
+	for(var z = 0; z < macaY.length;z++) //MAÇA/parede NA parede 1
+	{
+		for(var i = 0; i < paredeY1.length;i++)
+		{
+			if(macaX[z] == paredeX1 && macaY[z] == paredeY1[i])
+			{
+				macaX[z] = Math.trunc(Math.random() * ALEATORIO_MAXIMOX)*TAMANHO_PONTO;
+				macaY[z] = Math.trunc(Math.random() * ALEATORIO_MAXIMOY)*TAMANHO_PONTO;
+				verificarbugparede();
+			}
+		}
+	}
+	for(var z = 0; z < macaY.length;z++) //MAÇA/parede NA parede 2
+	{
+		for(var i = 0; i < paredeY2.length;i++)
+		{
+			if(macaX[z] == paredeX2 && macaY[z] == paredeY2[i])
+			{
+				macaX[z] = Math.trunc(Math.random() * ALEATORIO_MAXIMOX)*TAMANHO_PONTO;
+				macaY[z] = Math.trunc(Math.random() * ALEATORIO_MAXIMOY)*TAMANHO_PONTO;
+				verificarbugparede();
+			}
+		}
+	}
+}
+
+function verificarColisao() {
+    for (var z = pontos; z > 0; z--) {
+        if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
+            noJogo = false;
+		}
+    }
+
+    if (y[0] >= C_ALTURA) {
+        y[0] = 0;
+    }
+
+    if (y[0] < 0) {
+       y[0] = C_ALTURA;
+    }
+
+    if (x[0] >= C_LARGURA) {
+      x[0] = 0;
+    }
+
+    if (x[0] < 0) {
+      x[0] = C_LARGURA;
+    }
+}
+
+
+function mover() {
+    for (var z = pontos; z > 0; z--) {
+        x[z] = x[z-1];
+        y[z] = y[z-1];
+    }
+
+    if (paraEsquerda) {
+        x[0] -= TAMANHO_PONTO;
+    }
+
+    if (paraDireita) {
+        x[0] += TAMANHO_PONTO;
+    }
+
+    if (paraCima) {
+        y[0] -= TAMANHO_PONTO;
+    }
+
+    if (paraBaixo) {
+        y[0] += TAMANHO_PONTO;
+    }
+}    
+
+function fazerDesenho() {
+    c.clearRect(0, 0, C_LARGURA, C_ALTURA);
+	c.fillRect(0, 0, C_LARGURA, C_ALTURA);
+	
+    if (noJogo){  
+		
+		localizarMaca();
+		localizarobs();
+		localizarMacaBr();
+		localizarMacaAm();
+		localizarMacaAz();
+		localizarMacaVer();
+		
+        for (var z = 0; z < pontos; z++) {
+            if (z == 0) {
+                c.drawImage(cabeca, x[z], y[z]);
+            } else {
+                c.drawImage(bola, x[z], y[z]);
+            }
+        } 
+		for(var z = 0;z<200;z++){
+				c.drawImage(parede,paredeX1,paredeY1[z]);
+			}
+		for(var z = 0;z<200;z++){
+				c.drawImage(parede,paredeX2,paredeY2[z]);
+			}		
+    }
+}
+function playAudio1() { 
+  o.play(); 
+  o.currentTime = 0
+} 
+function playAudio3() { 
+  h.currentTime = 40
+  h.play(); 
+} 
+function playAudio4() { 
+  u.play(); 
+  u.currentTime = 0
+} 
+
+function vitoria(){
+
+	noJogo = false;
+	c.fillStyle = "black";
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+    c.font = "small-caps 900 28px Comic Sans MS";
+    c.fillText("PARABÉNS!! " + j, C_LARGURA/2, C_ALTURA/2);
+	c.fillText("VOCÊ GANHOU", C_LARGURA/2, 680/2);
+
+
+
+}
+function fimDeJogo() {      
+	
+	noJogo = false;
+	c.fillStyle = "black";
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+    c.font = "small-caps 900 28px Comic Sans MS";
+    c.fillText("Oh Não! " + j, C_LARGURA/2, C_ALTURA/2);
+	c.fillText("Você Perdeu", C_LARGURA/2, 650/2);
+	
+	
+}
+function fimDeJogo2(){ 
+	
+	noJogo = false;
+	c.fillStyle = "black";
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+    c.font = "small-caps 900 28px Comic Sans MS";
+    c.fillText("O tempo acabou" , C_LARGURA/2, C_ALTURA/2);
+	c.fillText("Você Perdeu", C_LARGURA/2, 650/2);
+	
+}
+onkeydown = function(e) {
+    var tecla = e.keyCode;
+
+    if ((tecla == TECLA_ESQUERDA) && (!paraDireita)) {
+        paraEsquerda = true;
+        paraCima = false;
+        paraBaixo = false;
+    }
+
+    if ((tecla == TECLA_DIREITA) && (!paraEsquerda)) {
+        paraDireita = true;
+        paraCima = false;
+        paraBaixo = false;
+    }
+
+    if ((tecla == TECLA_ACIMA) && (!paraBaixo)) {
+        paraCima = true;
+        paraDireita = false;
+        paraEsquerda = false;
+    }
+
+    if ((tecla == TECLA_ABAIXO) && (!paraCima)) {
+        paraBaixo = true;
+        paraDireita = false;
+        paraEsquerda = false;
+    }        
+};
+
+//canvas 2
+function canvasStatus(){
+	var crono = document.getElementById("menu");
+	var c = crono.getContext("2d");
+	c.fillStyle = "#0d69ed";
+	c.fillRect(0,0,400,700);    
+
+	c.fillStyle = "black";     
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+	c.font = "small-caps 900 28px Comic Sans MS";
+	c.fillText("TEMPO:",200,50);	
+	function cronometro()  
+	{
+		
+		c.fillText((Math.trunc(tempo/10)),200,100);		
+		tempo--; 
+		if(tempo == -1)  
+		{
+			tempo = 0;
+		}
+		if(tempo == 0 && score != 45 && pontos != 1 && pontos != 0)  
+		{
+			setInterval(function (){pontos--},100); 
+			setTimeout(function()
+			{
+				for(i=1 ;i<=15;i++) 
+				{
+					macaX[i] = 651651;
+					macaY[i] = 616516;				
+				}
+				for(i = 1; i <=10;i++)
+				{
+					obsX[i] = 561651;
+					obsY[i] = 561655;
+				}
+			} , 800
+			)
+			setTimeout(fimDeJogo2,1000);		
+		} 
+
+	}
+		setTimeout(cronometro,100);  
+		clearTimeout(cronometro);
+		
+	c.fillStyle = "black";     
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+	c.font = "small-caps 900 28px Comic Sans MS";
+	c.fillText("PONTOS:",200,200);
+	
+	function pontuacao()  
+	{
+		c.fillText(score+"/45",200,250);
+		if(score == 46) 
+		{
+			score = 45;      
+		}
+		if(score == 45 && tempo != 0) 
+		{
+			setInterval(function (){pontos--},100);	           			
+			setTimeout(function()
+			{
+				for(i = 1; i <=10;i++) 
+				{
+					obsX[i] = 561851;
+					obsY[i] = 566655;
+				}
+			} , 800
+			)
+			setTimeout(vitoria,1000);		
+		}
+		
+	}
+	setTimeout(pontuacao,100);
+	clearTimeout(pontuacao);
+	
+	c.fillStyle = "black";     
+    c.textBaseline = "middle";
+    c.textAlign = "center"; 
+	c.font = "small-caps 900 28px Comic Sans MS";
+	c.fillText("JOGADOR:",200,350);
+	c.fillText(j,200,400);
+	
+	c.fillStyle = "black";     
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+	c.font = "small-caps 900 28px Comic Sans MS";
+	c.fillText("VIDAS",200,500);	
+	
+	function lifes()  
+	{
+		c.fillText(vida+"/10",200,550);
+		if(vida < 0) 
+		{
+			vida = 0;      
+		}
+		if(vida == 0)
+		{
+			setInterval(function (){pontos--},100);	           			
+			setTimeout(function()
+			{
+				for(i=1 ;i<=15;i++) 
+				{
+					macaX[i] = 658651;
+					macaY[i] = 616526;				
+				}
+				for(i = 1; i <=10;i++) 
+				{
+					obsX[i] = 561851;
+					obsY[i] = 566655;
+				}
+			} , 800
+			)
+			setTimeout(fimDeJogo,1000);	
+			
+		}
+		
+	}
+	setTimeout(lifes,100);
+	clearTimeout(lifes);
+	
+}
+
+function wincondition()
+{
+	if(vida == 0 && tempo != 0 && score != 45 )
+	{
+		setTimeout(fimDeJogo,100);
+		setTimeout(function (){ pontos--},50) 
+		setTimeout(function()
+		{
+		for(i=1 ;i<=15;i++) 
+		{
+			macaX[i] = 658651;
+			macaY[i] = 616526;				
+		}
+		for(i = 1; i <=10;i++) 
+		{
+			obsX[i] = 561681;
+			obsY[i] = 561645;
+		}						
+		},60);
+
+	}
+}
+
+
+function rankingcanvas(){
+	var RK = document.getElementById("ranking");
+	var c = RK.getContext("2d");
+	c.fillStyle = "#0d69ed";
+	c.fillRect(0,0,400,700); 
+	
+	c.fillStyle = "black";     
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+	c.font = "small-caps 900 28px Comic Sans MS";
+	c.fillText("RANKING:",160,50);
+	
+
+}
+</script>
+

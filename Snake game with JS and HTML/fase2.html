@@ -1,0 +1,483 @@
+<meta charset="utf-8">
+
+<audio id="som1">
+  <source src="yoda.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="som2">
+  <source src="nope.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="som3">
+  <source src="bonfire.mp3" type="audio/mpeg">
+</audio>
+
+<canvas id="tela" width="600" height="600" ></canvas>
+<canvas id="menu" width="400" height="600"></canvas>
+
+<script>
+
+
+var j = prompt("Qual seu nome?");
+if(j == ""){
+	j = "Visitante";
+}
+
+var tela;
+var tela2;
+var c;
+var s;
+var vida = 5
+var score = 0;
+var tempo = 400
+
+var cabeca;
+var maca;
+var bola;
+var obs;
+var pontos;
+var o = document.getElementById("som1"); 
+var l = document.getElementById("som2"); 
+var h = document.getElementById("som3"); 
+var macaX = [];
+var macaY = [];
+var obsX = [];
+var obsY = [];
+
+
+var paraEsquerda = false;
+var paraDireita = true;
+var paraCima = false;
+var paraBaixo = false;
+var noJogo = true;    
+
+const TAMANHO_PONTO = 10;
+const ALEATORIO_MAXIMOX = 58;
+const ALEATORIO_MAXIMOY = 58;
+const ATRASO = 40;
+const C_ALTURA = 600;
+const C_LARGURA = 600;    
+
+const TECLA_ESQUERDA = 37;
+const TECLA_DIREITA = 39;
+const TECLA_ACIMA = 38;
+const TECLA_ABAIXO = 40;
+
+var x = [];
+var y = [];
+
+setInterval(canvasStatus,100);
+iniciar();
+
+// Funções
+
+  
+function iniciar() {
+    tela = document.getElementById("tela");
+    c = tela.getContext("2d");
+
+	c.beginPath();
+	c.rect(0, 0, C_LARGURA, C_ALTURA);
+	c.fillStyle = "gray";
+	c.fill();
+	
+    carregarImagens();
+	playAudio3();
+    criarCobra();
+    localizarMaca();
+	localizarobs();
+    setTimeout("cicloDeJogo()", ATRASO);
+}    
+
+
+function carregarImagens() {
+    cabeca = new Image();
+    cabeca.src = "cabeca.png";    
+    
+    bola = new Image();
+    bola.src = "ponto.png"; 
+    
+	maca = new Image();
+    maca.src = "maca.png";
+	
+	obs = new Image();    
+	obs.src = "obs.png";
+}
+
+function criarCobra() {
+    pontos = 6;
+	
+    for (var z = 0; z < pontos; z++) {
+        x[z] = 50 - z * 10;
+        y[z] = 50;
+    }
+}
+
+function localizarMaca(){
+	
+		for(i = 1; i <=15;i++){
+		var r = Math.trunc(Math.random() * ALEATORIO_MAXIMOX);
+		var rX = r * TAMANHO_PONTO;
+			
+		macaX.push(rX);
+			
+
+		var p = Math.trunc(Math.random() * ALEATORIO_MAXIMOY);
+		var pY = p * TAMANHO_PONTO;
+
+		macaY.push(pY);
+
+		c.drawImage(maca, macaX[i], macaY[i]); 
+
+	}
+	
+}    
+
+function localizarobs() {
+	for(i = 1; i <=10;i++) {	
+		var a = Math.trunc(Math.random() * ALEATORIO_MAXIMOX);
+		var aX = a * TAMANHO_PONTO;
+			
+		obsX.push(aX);
+			
+		var b = Math.trunc(Math.random() * ALEATORIO_MAXIMOY);
+		var bY = b * TAMANHO_PONTO;
+			
+		obsY.push(bY);
+		c.drawImage(obs, obsX[i], obsY[i]); 
+			
+	}
+}
+
+function cicloDeJogo() {
+    if (noJogo) {
+        verificarMaca();
+		verificarobs();
+        verificarColisao();
+        mover();
+        fazerDesenho();
+        setTimeout("cicloDeJogo()", ATRASO);
+    }
+}
+
+function verificarMaca() {
+    for(i = 1; i <=15 ; i++){
+		if ((x[0] == macaX[i]) && (y[0] == macaY[i])) {		       
+			score++;
+			playAudio1()
+			macaX[i] = 165121;
+			macaY[i] = 156166;
+			if(score%3 == 0){
+			vida++;
+			}
+		}
+	}
+
+}
+
+function verificarobs() {
+	 for(i = 1; i <=10 ; i++){
+		if ((x[0] == obsX[i]) && (y[0] == obsY[i])) {		       
+			vida--;
+			playAudio2()
+			obsX[i] = 165121;
+			obsY[i] = 156166;
+
+		}
+
+    }
+} 
+
+function verificarColisao() {
+    for (var z = pontos; z > 0; z--) {
+        if ((z > 4) && (x[0] == x[z]) && (y[0] == y[z])) {
+            noJogo = false;
+		}
+    }
+
+    if (y[0] >= C_ALTURA) {
+        y[0] = 0;
+    }
+
+    if (y[0] < 0) {
+       y[0] = C_ALTURA;
+    }
+
+    if (x[0] >= C_LARGURA) {
+      x[0] = 0;
+    }
+
+    if (x[0] < 0) {
+      x[0] = C_LARGURA;
+    }
+}
+
+
+function mover() {
+    for (var z = pontos; z > 0; z--) {
+        x[z] = x[z-1];
+        y[z] = y[z-1];
+    }
+
+    if (paraEsquerda) {
+        x[0] -= TAMANHO_PONTO;
+    }
+
+    if (paraDireita) {
+        x[0] += TAMANHO_PONTO;
+    }
+
+    if (paraCima) {
+        y[0] -= TAMANHO_PONTO;
+    }
+
+    if (paraBaixo) {
+        y[0] += TAMANHO_PONTO;
+    }
+}    
+
+function fazerDesenho() {
+    c.clearRect(0, 0, C_LARGURA, C_ALTURA);
+	c.fillRect(0, 0, C_LARGURA, C_ALTURA);
+	
+    if (noJogo){  
+		
+		localizarMaca();
+		localizarobs();
+		
+        for (var z = 0; z < pontos; z++) {
+            if (z == 0) {
+                c.drawImage(cabeca, x[z], y[z]);
+            } else {
+                c.drawImage(bola, x[z], y[z]);
+            }
+        }    
+    }
+}
+
+
+function vitoria(){
+
+	noJogo = false;
+	c.fillStyle = "black";
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+    c.font = "small-caps 900 28px Comic Sans MS";
+    c.fillText("PARABÉNS!! " + j, C_LARGURA/2, C_ALTURA/2);
+	c.fillText("VOCÊ GANHOU", C_LARGURA/2, 680/2);
+
+
+
+}
+function fimDeJogo() {      
+	noJogo = false;
+	c.fillStyle = "black";
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+    c.font = "small-caps 900 28px Comic Sans MS";
+    c.fillText("Oh Não! " + j, C_LARGURA/2, C_ALTURA/2);
+	c.fillText("Você Perdeu", C_LARGURA/2, 650/2);
+	
+	
+}
+function fimDeJogo2(){ 
+	noJogo = false;
+	c.fillStyle = "black";
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+    c.font = "small-caps 900 28px Comic Sans MS";
+    c.fillText("O tempo acabou" , C_LARGURA/2, C_ALTURA/2);
+	c.fillText("Você Perdeu", C_LARGURA/2, 650/2);
+	
+}
+
+function playAudio1() { 
+  o.play(); 
+  o.currentTime = 0
+} 
+function playAudio2() { 
+  l.play(); 
+  l.currentTime = 0
+}
+
+function playAudio3() { 
+  h.currentTime = 40
+  h.play(); 
+} 
+onkeydown = function(e) {
+    var tecla = e.keyCode;
+
+    if ((tecla == TECLA_ESQUERDA) && (!paraDireita)) {
+        paraEsquerda = true;
+        paraCima = false;
+        paraBaixo = false;
+    }
+
+    if ((tecla == TECLA_DIREITA) && (!paraEsquerda)) {
+        paraDireita = true;
+        paraCima = false;
+        paraBaixo = false;
+    }
+
+    if ((tecla == TECLA_ACIMA) && (!paraBaixo)) {
+        paraCima = true;
+        paraDireita = false;
+        paraEsquerda = false;
+    }
+
+    if ((tecla == TECLA_ABAIXO) && (!paraCima)) {
+        paraBaixo = true;
+        paraDireita = false;
+        paraEsquerda = false;
+    }        
+};
+
+//canvas 2
+function canvasStatus(){
+	var crono = document.getElementById("menu");
+	var c = crono.getContext("2d");
+	c.fillStyle = "#0d69ed";
+	c.fillRect(0,0,400,700);    
+
+	c.fillStyle = "black";     
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+	c.font = "small-caps 900 28px Comic Sans MS";
+	c.fillText("TEMPO:",200,50);	
+	function cronometro()  
+	{
+		
+		c.fillText((Math.trunc(tempo/10)),200,100);		
+		tempo--; 
+		if(tempo == -1)  
+		{
+			tempo = 0;
+		}
+		if(tempo == 0 && score != 15 && pontos != 1 && pontos != 0)  
+		{
+			setInterval(function (){pontos--},100); 
+			setTimeout(function()
+			{
+				for(i=1 ;i<=15;i++) 
+				{
+					macaX[i] = 651651;
+					macaY[i] = 616516;				
+				}
+				for(i = 1; i <=10;i++)
+				{
+					obsX[i] = 561651;
+					obsY[i] = 561655;
+				}
+			} , 800
+			)
+			setTimeout(fimDeJogo2,1000);		
+		} 
+
+	}
+		setTimeout(cronometro,100);  
+		clearTimeout(cronometro);
+		
+	c.fillStyle = "black";     
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+	c.font = "small-caps 900 28px Comic Sans MS";
+	c.fillText("PONTOS:",200,200);
+	
+	function pontuacao()  
+	{
+		c.fillText(score+"/15",200,250);
+		if(score == 16) 
+		{
+			score = 15;      
+		}
+		if(score == 15 && tempo != 0) 
+		{
+			setInterval(function (){pontos--},100);	           			
+			setTimeout(function()
+			{
+				for(i = 1; i <=10;i++) 
+				{
+					obsX[i] = 561851;
+					obsY[i] = 566655;
+				}
+			} , 800
+			)
+			setTimeout(vitoria,1000);		
+		}
+		
+	}
+	setTimeout(pontuacao,100);
+	clearTimeout(pontuacao);
+	
+	c.fillStyle = "black";     
+    c.textBaseline = "middle";
+    c.textAlign = "center"; 
+	c.font = "small-caps 900 28px Comic Sans MS";
+	c.fillText("JOGADOR:",200,350);
+	c.fillText(j,200,400);
+	
+	c.fillStyle = "black";     
+    c.textBaseline = "middle"; 
+    c.textAlign = "center"; 
+	c.font = "small-caps 900 28px Comic Sans MS";
+	c.fillText("VIDAS",200,500);	
+	
+	function lifes()  
+	{
+		c.fillText(vida+"/10",200,550);
+		if(vida < 0) 
+		{
+			vida = 0;      
+		}
+		if(vida == 0)
+		{
+			setInterval(function (){pontos--},100);	           			
+			setTimeout(function()
+			{
+				for(i=1 ;i<=15;i++) 
+				{
+					macaX[i] = 658651;
+					macaY[i] = 616526;				
+				}
+				for(i = 1; i <=10;i++) 
+				{
+					obsX[i] = 561851;
+					obsY[i] = 566655;
+				}
+			} , 800
+			)
+			setTimeout(fimDeJogo,1000);	
+			
+		}
+		
+	}
+	setTimeout(lifes,100);
+	clearTimeout(lifes);
+	
+}
+
+function wincondition()
+{
+	if(vida == 0 && tempo != 0 && score != 15 )
+	{
+		setTimeout(fimDeJogo,100);
+		setTimeout(function (){ pontos--},50) 
+		setTimeout(function()
+		{
+		for(i=1 ;i<=15;i++) 
+		{
+			macaX[i] = 658651;
+			macaY[i] = 616526;				
+		}
+		for(i = 1; i <=10;i++) 
+		{
+			obsX[i] = 561681;
+			obsY[i] = 561645;
+		}						
+		},60);
+
+	}
+}
+
+</script>
+
